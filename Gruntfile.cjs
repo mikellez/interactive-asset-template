@@ -2,8 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 const postcss = require('postcss');
+require('dotenv').config();
 
 const prefix = process.env.VITE_PREFIX || ''; 
+console.log('prefix', prefix);
 
 module.exports = function(grunt) {
 
@@ -29,7 +31,7 @@ module.exports = function(grunt) {
     copy: {
       main: {
         files: [
-          // 1. Copy all assets from 'assets/' to 'src/assets/',
+          // 1. Copy all assets from 'assets/' to 'public/assets/',
           //    excluding the 'assets/css/' directory's contents.
           //    This will copy subdirectories like 'js/', 'images/', etc.
           {
@@ -37,11 +39,24 @@ module.exports = function(grunt) {
             cwd: 'assets/', // Source directory, relative to Gruntfile
             src: [
               '**/*',       // Select all files and folders
-              '!css/**'     // Exclude everything within the 'css' subfolder
+              '!css/**',     // Exclude everything within the 'css' subfolder
+              '!js/**'     // Exclude everything within the 'css' subfolder
+            ],
+            dest: 'public/assets' // Destination directory
+          },
+          // 2. Copy css and js assets from 'assets/' to 'src/assets/',
+          //    excluding the 'assets/css/' directory's contents.
+          //    This will copy subdirectories like 'js/', 'images/', etc.
+          {
+            expand: true,
+            cwd: 'assets/', // Source directory, relative to Gruntfile
+            src: [
+              'css/**',     // Exclude everything within the 'css' subfolder
+              'js/**'     // Exclude everything within the 'css' subfolder
             ],
             dest: 'src/assets' // Destination directory
           },
-          // 2. Copy '*.css' files from 'assets/css/' to 'src/styles/scss/',
+          // 3. Copy '*.css' files from 'assets/css/' to 'src/styles/scss/',
           //    renaming them to '*.scss'.
           {
             expand: true,
@@ -305,9 +320,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('swap-bundle-prefix', 'Swap bundle prefix to all SCSS files in the src/styles/scss directory', function() {
     const done = this.async();
-    const prefix = 'bundle-3ds-iawc-ad-evtolaam-interactive';
 
-    const cssFiles = glob.sync('public/assets/css/*.css');
+    const cssFiles = glob.sync('src/assets/css/*.css');
     //const cssFiles = ['./public/assets/css/pages.css'];
 
     if (cssFiles.length === 0) {
